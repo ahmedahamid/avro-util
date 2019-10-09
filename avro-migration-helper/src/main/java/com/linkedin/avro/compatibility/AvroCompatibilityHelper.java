@@ -12,6 +12,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.OutputStream;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -67,13 +68,17 @@ public class AvroCompatibilityHelper {
     return newBinaryEncoder(new ObjectOutputToOutputStreamAdapter(out));
   }
 
+  public static BinaryDecoder newBinaryDecoder(InputStream in) {
+    return FACTORY.newBinaryDecoder(in);
+  }
+
   /**
    * to be migrated to SpecificData.getDecoder() in avro 1.8+
    * @param in object input
    * @return a binary decoder on top of the given ObjectInput
    */
   public static BinaryDecoder newBinaryDecoder(ObjectInput in) {
-    return DecoderFactory.defaultFactory().createBinaryDecoder(new ObjectInputToInputStreamAdapter(in), null);
+    return newBinaryDecoder(new ObjectInputToInputStreamAdapter(in));
   }
 
   public static JsonEncoder newJsonEncoder(Schema schema, OutputStream out) throws IOException {
@@ -102,6 +107,18 @@ public class AvroCompatibilityHelper {
 
   public static GenericData.Fixed newFixedField(Schema ofType, byte[] contents) {
     return FACTORY.newFixedField(ofType, contents);
+  }
+
+  public static Object newInstance(Class clazz, Schema schema) {
+    return FACTORY.newInstance(clazz, schema);
+  }
+
+  public static Schema getSchema(Type type) {
+    return FACTORY.getSchema(type);
+  }
+
+  public static Object getDefaultValue(Schema.Field field) {
+    return FACTORY.getDefaultValue(field);
   }
 
   /**
